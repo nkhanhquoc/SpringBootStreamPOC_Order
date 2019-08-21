@@ -1,0 +1,26 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: order
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+      bindings:
+        order-verify-request:
+          destination: orderVerifyRequest
+          contentType: application/json
+          group: requestProducer
+        order-verify-response:
+          destination: orderVerifyResponse
+          contentType: application/json
+          group: responseConsumer
+  datasource:
+    url: jdbc:mysql://localhost:3306/test_springboot_stream?useUnicode=yes&characterEncoding=UTF-8
+    username: root
+    password: Welcome1
+    driver-class-name: com.mysql.jdbc.Driver
+  jpa:
+    show-sql: true
