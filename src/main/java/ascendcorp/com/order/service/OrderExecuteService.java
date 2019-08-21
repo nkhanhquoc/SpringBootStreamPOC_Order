@@ -1,44 +1,42 @@
 package ascendcorp.com.order.service;
 
-import ascendcorp.com.order.mapper.OrderEntityMapper;
+import ascendcorp.com.order.mapper.VerifyOrderMapper;
 import ascendcorp.com.order.model.Order;
-import ascendcorp.com.order.repository.OrderRepository;
+import ascendcorp.com.order.model.VerifyOrder;
+import ascendcorp.com.order.repository.VerifyOrderRepository;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OrderExecuteService {
 
-  private OrderRepository orderRepository;
+  private VerifyOrderRepository verifyOrderRepository;
 
   private OrderStreamService orderStreamService;
 
-  private OrderEntityMapper mapper;
+  private VerifyOrderMapper mapper;
 
-  public OrderExecuteService(OrderRepository orderRepository,
-      OrderEntityMapper mapper,
+  public OrderExecuteService(VerifyOrderRepository verifyOrderRepository,
+      VerifyOrderMapper mapper,
       OrderStreamService orderStreamService) {
-    this.orderRepository = orderRepository;
+    this.verifyOrderRepository = verifyOrderRepository;
     this.mapper = mapper;
     this.orderStreamService = orderStreamService;
   }
 
-  public void save(Order order){
-    orderRepository.save(mapper.transform(order));
 
-  }
-
-  public void sendVerify(Long value){
-    Order order = Order.builder()
-        .message("new Order")
-        .status("INIT")
-        .id(UUID.randomUUID().toString())
-        .value(value)
+  public void verifyOrder(Order order){
+    String verifyStatus = order.getValue() > 100 ? "DENIED" : "ACCEPT";
+    VerifyOrder verifyOrder = VerifyOrder.builder()
+        .id(order.getId())
+        .oldStatus(order.getStatus())
+        .newStatus(verifyStatus)
         .build();
 
+    order.setStatus(verifyStatus);
+
     orderStreamService.sendOrder(order);
-    order.setStatus("SENT_VERIFY");
-    this.save(order);
+    verifyOrderRepository.save(mapper.transform(verifyOrder));
   }
 
 }

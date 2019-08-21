@@ -23,7 +23,7 @@ public class OrderStreamService {
   public void sendOrder(final Order order) {
     logger.info("Send order id = {}, status = {}, value = {}",
         order.getId(), order.getStatus(), order.getValue());
-    MessageChannel messageChannel = orderStreams.sendVerifyOrder();
+    MessageChannel messageChannel = orderStreams.sendVerifiedOrder();
     messageChannel.send(MessageBuilder
         .withPayload(order)
         .setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON)

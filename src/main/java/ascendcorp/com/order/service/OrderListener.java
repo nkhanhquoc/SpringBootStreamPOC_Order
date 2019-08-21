@@ -2,6 +2,7 @@ package ascendcorp.com.order.service;
 
 import ascendcorp.com.order.logger.Logger;
 import ascendcorp.com.order.model.Order;
+import ascendcorp.com.order.model.VerifyOrder;
 import ascendcorp.com.order.stream.processor.OrderStreams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.StreamListener;
@@ -24,7 +25,7 @@ public class OrderListener {
   public void handleOrder(@Payload Order order) {
     logger.info("Order Id = {}.  order status: {}", order.getId(),order.getStatus());
 
-    orderExecuteService.save(order);
+    orderExecuteService.verifyOrder(order);
 
   }
 

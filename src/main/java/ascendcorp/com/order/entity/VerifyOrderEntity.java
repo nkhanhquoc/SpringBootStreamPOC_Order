@@ -11,17 +11,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-@Table(name = "torder")
+@Table(name = "verify_history")
 @AllArgsConstructor
 @Builder
-public class OrderEntity {
-
+public class VerifyOrderEntity {
   @Id
   private String id;
-
-  private Long value;
-
-  private String status;
-
-  private String message;
+  private String oldStatus;
+  private String newStatus;
 }
