@@ -33,10 +33,11 @@ public class OrderExecuteService {
         .newStatus(verifyStatus)
         .build();
 
+    verifyOrderRepository.save(mapper.transform(verifyOrder));
+
     order.setStatus(verifyStatus);
 
     orderStreamService.sendOrder(order);
-    verifyOrderRepository.save(mapper.transform(verifyOrder));
   }
 
 }

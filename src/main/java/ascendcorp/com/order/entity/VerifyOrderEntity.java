@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
-@Table(name = "verify_history")
+@Table(name = "verify_order")
 @AllArgsConstructor
 @Builder
 public class VerifyOrderEntity {
