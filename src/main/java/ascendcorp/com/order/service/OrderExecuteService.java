@@ -36,9 +36,10 @@ public class OrderExecuteService {
         .value(value)
         .build();
 
-    orderStreamService.sendOrder(order);
-    order.setStatus("SENT_VERIFY");
     this.save(order);
+
+    orderStreamService.sendOrder(order);
+
   }
 
 }
