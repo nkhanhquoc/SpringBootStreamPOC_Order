@@ -1,4 +1,4 @@
-package ascendcorp.com.order.service;
+package ascendcorp.com.order.service.stream;
 
 import ascendcorp.com.order.mapper.OrderEntityMapper;
 import ascendcorp.com.order.model.Order;
