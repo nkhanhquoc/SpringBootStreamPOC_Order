@@ -1,8 +1,7 @@
-package ascendcorp.com.order.service;
+package ascendcorp.com.order.service.stream;
 
 import ascendcorp.com.order.logger.Logger;
 import ascendcorp.com.order.model.Order;
-import ascendcorp.com.order.model.VerifyOrder;
 import ascendcorp.com.order.stream.processor.OrderStreams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.StreamListener;

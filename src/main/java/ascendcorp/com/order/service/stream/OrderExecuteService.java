@@ -1,10 +1,9 @@
-package ascendcorp.com.order.service;
+package ascendcorp.com.order.service.stream;
 
 import ascendcorp.com.order.mapper.VerifyOrderMapper;
 import ascendcorp.com.order.model.Order;
 import ascendcorp.com.order.model.VerifyOrder;
 import ascendcorp.com.order.repository.VerifyOrderRepository;
-import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service

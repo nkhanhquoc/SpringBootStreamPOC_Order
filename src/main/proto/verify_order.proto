@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package ascendcorp.com.order;
+option java_package = "ascendcorp.com.order";
+option java_multiple_files = true;
+
+message GrpcOrder{
+  string id = 1;
+  string message = 2;
+  string status = 3;
+  int64 value = 4;
+}
+
+message OrderRequest{
+  GrpcOrder order = 1;
+}
+
+message OrderResponse{
+  GrpcOrder order = 1;
+}
+
+service VerifyService{
+  rpc VerifyOrder(OrderRequest) returns (OrderResponse);
+}
