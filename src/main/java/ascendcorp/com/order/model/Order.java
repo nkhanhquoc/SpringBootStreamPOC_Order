@@ -1,5 +1,6 @@
 package ascendcorp.com.order.model;
 
+import java.io.Serializable;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
@@ -7,7 +8,7 @@ import lombok.ToString;
 @Data
 @ToString
 @Builder
-public class Order {
+public class Order implements Serializable {
 
   private String id;
   private String message;

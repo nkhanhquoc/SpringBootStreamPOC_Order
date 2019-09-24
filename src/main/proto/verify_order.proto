@@ -12,7 +12,7 @@ message GrpcOrder{
 }
 
 message OrderRequest{
-  GrpcOrder order = 1;
+  string orderId = 1;
 }
 
 message OrderResponse{

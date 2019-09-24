@@ -5,42 +5,58 @@ import ascendcorp.com.order.OrderRequest;
 import ascendcorp.com.order.OrderResponse;
 import ascendcorp.com.order.VerifyServiceGrpc;
 import ascendcorp.com.order.logger.Logger;
-import ascendcorp.com.order.service.stream.OrderListener;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import java.util.UUID;
+import io.grpc.netty.GrpcSslContexts;
+import io.grpc.netty.NettyChannelBuilder;
+import java.io.File;
+import java.io.IOException;
+import org.lognet.springboot.grpc.autoconfigure.GRpcAutoConfiguration;
+import org.lognet.springboot.grpc.autoconfigure.GRpcServerProperties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ClientGrpc {
+@EnableConfigurationProperties({GRpcServerProperties.class})
+public class ClientGrpc{
 
-  private static final Logger logger = Logger.getInstance(OrderListener.class);
+  private static final Logger logger = Logger.getInstance(ClientGrpc.class);
 
   ManagedChannel channel;
 
-  public ClientGrpc() {
-    this.channel = ManagedChannelBuilder.
+  private GRpcServerProperties grpcServerProperties;
+
+  public ClientGrpc(GRpcServerProperties grpcServerProperties) throws IOException {
+    this.channel = NettyChannelBuilder.
         forAddress("localhost",50051)
+        .sslContext(
+            GrpcSslContexts
+                .forClient()
+                .trustManager(grpcServerProperties.getSecurity().getCertChain().getFile())
+                .build())
+        .intercept(new ClientBasicAuthInterceptor())
         .build();
   }
 
-  public void sendOrder(long value){
+  public GrpcOrder sendOrder(String value){
 
     VerifyServiceGrpc.VerifyServiceBlockingStub verifyStub =
         VerifyServiceGrpc.newBlockingStub(channel);
 
-    GrpcOrder grpcOrder = GrpcOrder.newBuilder()
-        .setId(UUID.randomUUID().toString())
-        .setMessage("new Order")
-        .setStatus("INIT")
-        .setValue(value)
-        .build();
+//    GrpcOrder grpcOrder = GrpcOrder.newBuilder()
+//        .setId(UUID.randomUUID().toString())
+//        .setMessage("new Order")
+//        .setStatus("INIT")
+//        .setValue(value)
+//        .build();
 
     OrderResponse response = verifyStub.verifyOrder(OrderRequest.newBuilder()
-        .setOrder(grpcOrder)
+        .setOrderId(value)
         .build());
 
-    logger.info("response from grpc server: "+response.getOrder().getMessage());
+    logger.info("response from grpc server: "+response.getOrder());
+    return response.getOrder();
 
   }
 

@@ -24,3 +24,6 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
   jpa:
     show-sql: true
+grpc:
+  security:
+    cert-chain: file:../order_verify/ssl/localhost.crt

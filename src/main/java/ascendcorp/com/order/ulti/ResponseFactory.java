@@ -21,6 +21,16 @@ public final class ResponseFactory {
     return ResponseEntity.ok(generalResponse);
   }
 
+  public static <T extends Serializable> ResponseEntity<GeneralResponse<T>> success(T data) {
+    ResponseStatus responseStatus = ResponseStatus.builder()
+        .code("SUCCESS")
+        .message("SUCCESS").build();
+    GeneralResponse<T> generalResponse = GeneralResponse.<T>builder().status(responseStatus)
+        .data(data)
+        .build();
+    return ResponseEntity.ok(generalResponse);
+  }
+
 
 
   public static ResponseEntity<GeneralResponse> error(HttpStatus httpStatus,
