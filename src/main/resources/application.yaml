@@ -21,9 +21,19 @@ spring:
     url: jdbc:mysql://localhost:3306/test_springboot_stream?useUnicode=yes&characterEncoding=UTF-8
     username: root
     password: Welcome1
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
-
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+  security:
+    user:
+      name: client1
+      password: password
+      roles: USER
 grpc:
   port: 50051
+  security:
+    cert-chain: file:../order/ssl/server.crt
+    private-key: file:../order/ssl/server.pem

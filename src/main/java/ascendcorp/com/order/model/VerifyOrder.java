@@ -7,7 +7,7 @@ import lombok.ToString;
 @Data
 @ToString
 @Builder
-public class VerifyOrder {
+public class VerifyOrder extends BaseModel{
 
   private String id;
   private String oldStatus;

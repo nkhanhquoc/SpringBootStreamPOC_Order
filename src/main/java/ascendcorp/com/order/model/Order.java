@@ -7,7 +7,7 @@ import lombok.ToString;
 @Data
 @ToString
 @Builder
-public class Order {
+public class Order extends BaseModel{
 
   private String id;
   private String message;
