@@ -34,10 +34,10 @@ public class OrderController {
   }
 
   @GetMapping("/order-grpc")
-  public ResponseEntity orderGrpc(@RequestParam("order") String value){
+  public ResponseEntity orderGrpc(@RequestParam("order") String value, @RequestParam("token") String token){
 
     logger.info("GRPC get request: {}",value);
-    GrpcOrder grpcOrder = clientGrpc.sendOrder(value);
+    GrpcOrder grpcOrder = clientGrpc.sendOrder(value, token);
     Order order = Order.builder()
         .id(grpcOrder.getId())
         .value(grpcOrder.getValue())
