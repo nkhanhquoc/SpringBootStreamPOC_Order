@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.vote.AffirmativeBased;
@@ -20,15 +21,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.provider.expression.OAuth2WebSecurityExpressionHandler;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
 
@@ -40,11 +39,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   private SecurityProperties securityProperties;
 
-  private TokenStore tokenStore = new InMemoryTokenStore();
+  private RedisConnectionFactory redisConnectionFactory;
 
   public SecurityConfiguration(
-      SecurityProperties securityProperties) {
+      SecurityProperties securityProperties,
+      RedisConnectionFactory redisConnectionFactory) {
     this.securityProperties = securityProperties;
+    this.redisConnectionFactory = redisConnectionFactory;
   }
 
   @Override
@@ -53,13 +54,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     return super.authenticationManagerBean();
   }
 
-
   @Bean
   public ResourceServerTokenServices tokenServices() {
     DefaultTokenServices tokenServices = new DefaultTokenServices();
     tokenServices.setSupportRefreshToken(true);
-    tokenServices.setTokenStore(this.tokenStore);
+    tokenServices.setTokenStore(redisTokenStore());
     return tokenServices;
+  }
+
+  @Bean
+  public TokenStore redisTokenStore() {
+    return new RedisTokenStore(redisConnectionFactory);
   }
 
   @Bean
@@ -73,11 +78,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 //                .collect(Collectors.toList()))
 //        .build()
         new User(securityProperties.getUser().getName(),
-            "{noop}"+securityProperties.getUser().getPassword(),
+            "{noop}" + securityProperties.getUser().getPassword(),
             securityProperties.getUser().getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList()))
-      ));
+    ));
   }
 
   @Bean
@@ -121,6 +126,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   public void configure(HttpSecurity http) throws Exception {
     http
+        .authorizeRequests()
+        .antMatchers("/oauth/authorize**", "/login**", "/error**")
+        .permitAll()
+        .and()
         .authorizeRequests()
         .antMatchers("/actuator/health").permitAll()
         .antMatchers("/actuator/**").hasRole("ADMIN")

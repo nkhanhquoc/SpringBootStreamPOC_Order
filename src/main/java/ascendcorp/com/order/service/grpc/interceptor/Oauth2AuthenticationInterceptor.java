@@ -19,7 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 
-//@GRpcGlobalInterceptor
+@GRpcGlobalInterceptor
 public class Oauth2AuthenticationInterceptor implements ServerInterceptor {
 
   private static final Logger log = Logger.getInstance(Oauth2AuthenticationInterceptor.class);
