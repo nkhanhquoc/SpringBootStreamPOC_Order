@@ -48,13 +48,12 @@ private final AuthenticationManager authenticationManager;
       String username = tokens[0];
 
       log.error("Basic Authentication Authorization header found for user: {}", username);
-      log.error("Basic Password Authentication Authorization header found for user: {}", tokens[1]);
 
       if (authenticationIsRequired(username)) {
         Authentication authRequest = new UsernamePasswordAuthenticationToken(username, tokens[1]);
         Authentication authResult = authenticationManager.authenticate(authRequest);
 
-        log.error("Authentication success: {}", authResult);
+        log.info("Authentication success: {}", authResult);
 
         SecurityContextHolder.getContext().setAuthentication(authResult);
       }

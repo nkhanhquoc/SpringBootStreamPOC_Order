@@ -39,21 +39,12 @@ public class GrpcVerifyService extends VerifyServiceGrpc.VerifyServiceImplBase {
   }
 
   @Override
-  @PreAuthorize("hasRole('USER')")
+  @PreAuthorize("hasRole('ADMIN')")
   public void verifyOrder(OrderRequest request, StreamObserver<OrderResponse> responseObserver) {
 
     String orderId = request.getOrderId();
-    logger.info("get order id = {}", orderId);
-//    String verifyStatus = order.getValue() > 100 ? "DENIED" : "ACCEPT";
-//    VerifyOrder verifyOrder = VerifyOrder.builder()
-//        .id(order.getId())
-//        .oldStatus(order.getStatus())
-//        .newStatus(verifyStatus)
-//        .build();
-//
-//    verifyOrderRepository.save(mapper.transform(verifyOrder));
+
     OrderEntity entity = orderRepository.getOne(orderId);
-    logger.info("entity: {}",entity);
     Order order = orderMapper.transform(entity);
     logger.info("get order: {}", order);
 
