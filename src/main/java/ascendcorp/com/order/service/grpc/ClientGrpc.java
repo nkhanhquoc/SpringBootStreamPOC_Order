@@ -4,23 +4,27 @@ import ascendcorp.com.order.GrpcOrder;
 import ascendcorp.com.order.OrderRequest;
 import ascendcorp.com.order.OrderResponse;
 import ascendcorp.com.order.VerifyServiceGrpc;
+import ascendcorp.com.order.constant.JwtConstants;
 import ascendcorp.com.order.logger.Logger;
+import ascendcorp.com.order.service.grpc.credentials.JwtCallCredential;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import io.grpc.Metadata;
-import io.grpc.internal.GrpcUtil;
 import io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.NettyChannelBuilder;
 import io.grpc.stub.MetadataUtils;
-import java.io.File;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.IOException;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import org.lognet.springboot.grpc.autoconfigure.GRpcAutoConfiguration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.lognet.springboot.grpc.autoconfigure.GRpcServerProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -43,15 +47,21 @@ public class ClientGrpc{
                 .trustManager(grpcServerProperties.getSecurity().getCertChain().getFile())
                 .build())
 //        .intercept(new ClientBasicAuthInterceptor())
+
         .build();
   }
 
   public GrpcOrder sendOrder(String value, String token){
 
-    VerifyServiceGrpc.VerifyServiceBlockingStub verifyStub =
-        VerifyServiceGrpc.newBlockingStub(channel);
+    String jwt = getJwt();
+    logger.info("JWT Token: {}",jwt);
+    JwtCallCredential jwtToken = new JwtCallCredential(jwt);
 
-    verifyStub = token(verifyStub, token);
+    VerifyServiceGrpc.VerifyServiceBlockingStub verifyStub =
+        VerifyServiceGrpc.newBlockingStub(channel)
+            .withCallCredentials(jwtToken);
+
+//    verifyStub = token(verifyStub, token);
 
 //    GrpcOrder grpcOrder = GrpcOrder.newBuilder()
 //        .setId(UUID.randomUUID().toString())
@@ -77,6 +87,19 @@ public class ClientGrpc{
         "Bearer "+token);
     stub = MetadataUtils.attachHeaders(stub,metadata);
     return stub;
+  }
+
+  private static String getJwt() {
+    List<GrantedAuthority> grantedAuthorities = AuthorityUtils
+        .commaSeparatedStringToAuthorityList("ROLE_USER");
+
+    return Jwts.builder()
+        .setSubject("test1") // client's identifier
+        .claim("authorities", grantedAuthorities.stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.toList()))
+        .signWith(SignatureAlgorithm.HS256, JwtConstants.JWT_SIGNING_KEY)
+        .compact();
   }
 
 

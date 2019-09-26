@@ -1,4 +1,4 @@
-package ascendcorp.com.order.service.grpc;
+package ascendcorp.com.order.service.grpc.interceptor;
 
 import io.grpc.CallOptions;
 import io.grpc.Channel;
@@ -11,6 +11,7 @@ import org.lognet.springboot.grpc.GRpcGlobalInterceptor;
 
 @GRpcGlobalInterceptor
 public class ClientBasicAuthInterceptor implements ClientInterceptor {
+
 
   @Override
   public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(
