@@ -35,9 +35,6 @@ public class ClientGrpc{
 
   ManagedChannel channel;
 
-  @Autowired
-  private RedisTemplate redisTemplate;
-
   public ClientGrpc(GRpcServerProperties grpcServerProperties) throws IOException {
     this.channel = NettyChannelBuilder.
         forAddress("localhost",50051)
