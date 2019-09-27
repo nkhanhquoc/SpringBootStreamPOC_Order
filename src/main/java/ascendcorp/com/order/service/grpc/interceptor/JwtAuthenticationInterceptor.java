@@ -44,12 +44,10 @@ public class JwtAuthenticationInterceptor implements ServerInterceptor {
     if (!(authHeader.startsWith("Jwt ") || authHeader.startsWith("jwt "))) {
       return serverCallHandler.startCall(serverCall, metadata);
     }
-    Context ctx;
     try {
       String token = authHeader.substring(4).trim();
       log.info("JWT Token found: {}", token);
       Jws<Claims> claims = parser.parseClaimsJws(token);
-      log.info("subject: {}", claims.getBody().getSubject());
       if (claims.getBody().getSubject() != null) {
 
         @SuppressWarnings("unchecked")
