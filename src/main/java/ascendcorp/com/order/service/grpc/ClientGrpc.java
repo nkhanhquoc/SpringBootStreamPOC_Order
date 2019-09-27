@@ -46,29 +46,24 @@ public class ClientGrpc{
                 .forClient()
                 .trustManager(grpcServerProperties.getSecurity().getCertChain().getFile())
                 .build())
-//        .intercept(new ClientBasicAuthInterceptor())
+//        .intercept(new ClientBasicAuthInterceptor()) //for Basic Auth
 
         .build();
   }
 
   public GrpcOrder sendOrder(String value, String token){
 
+    //for JWT
     String jwt = getJwt();
     logger.info("JWT Token: {}",jwt);
     JwtCallCredential jwtToken = new JwtCallCredential(jwt);
 
     VerifyServiceGrpc.VerifyServiceBlockingStub verifyStub =
-        VerifyServiceGrpc.newBlockingStub(channel)
+        VerifyServiceGrpc
+            .newBlockingStub(channel)
             .withCallCredentials(jwtToken);
-
+//for OAuth2
 //    verifyStub = token(verifyStub, token);
-
-//    GrpcOrder grpcOrder = GrpcOrder.newBuilder()
-//        .setId(UUID.randomUUID().toString())
-//        .setMessage("new Order")
-//        .setStatus("INIT")
-//        .setValue(value)
-//        .build();
 
     OrderResponse response = verifyStub.verifyOrder(OrderRequest.newBuilder()
         .setOrderId(value)
@@ -79,7 +74,7 @@ public class ClientGrpc{
 
   }
 
-  public VerifyServiceGrpc.VerifyServiceBlockingStub token(
+  private VerifyServiceGrpc.VerifyServiceBlockingStub token(
       VerifyServiceGrpc.VerifyServiceBlockingStub stub, String token){
 
     Metadata metadata = new Metadata();
